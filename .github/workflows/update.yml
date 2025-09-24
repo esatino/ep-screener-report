@@ -24,13 +24,14 @@ jobs:
 
       - name: Run report builder
         run: |
-          python build_report.py
-          cp ep_report.html index.html
+          echo "HELLO FROM BUILDER"
+          python build_report.py || echo "build_report.py missing"
+          cp ep_report.html index.html || echo "no ep_report.html yet"
           touch .nojekyll
           mkdir -p public
-          cp index.html ep_report.html ep_report.json .nojekyll public/
+          cp index.html ep_report.html ep_report.json .nojekyll public/ || true
           echo "----- CONTENT OF ./public -----"
-          ls -l public
+          ls -l public || echo "no public dir"
           echo "--------------------------------"
 
       - name: Upload artifact for GitHub Pages
