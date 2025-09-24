@@ -29,6 +29,9 @@ jobs:
           touch .nojekyll
           mkdir -p public
           cp index.html ep_report.html ep_report.json .nojekyll public/
+          echo "----- CONTENT OF ./public -----"
+          ls -l public
+          echo "--------------------------------"
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v1
