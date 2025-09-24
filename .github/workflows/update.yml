@@ -5,11 +5,6 @@ on:
     - cron: '0 13 * * *'   # 15:00 Zurich daily (13:00 UTC)
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,11 +25,19 @@ jobs:
       - name: Run report builder
         run: |
           echo "HELLO FROM BUILDER"
-          echo "<h1>Test Page</h1><p>If you see this, Pages works.</p>" > index.html
+          if python build_report.py; then
+            echo "✅ Report built"
+            cp ep_report.html index.html
+          else
+            echo "❌ build_report.py failed" >&2
+            echo "<html><body><h1>Build failed</h1><p>Check Actions logs for details.</p></body></html>" > index.html
+          fi
+          touch .nojekyll
           mkdir -p public
-          cp index.html public/
+          cp index.html ep_report.html ep_report.json .nojekyll public/ 2>/dev/null || true
           echo "----- CONTENT OF ./public -----"
-          ls -l public
+          ls -l public || echo "no public dir"
+          echo "--------------------------------"
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
@@ -44,6 +47,9 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
