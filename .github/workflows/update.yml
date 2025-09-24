@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write      # allow pushing/committing
-  pages: write         # allow Pages deployment
-  id-token: write      # required by deploy-pages
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build:
@@ -30,19 +30,11 @@ jobs:
       - name: Run report builder
         run: |
           echo "HELLO FROM BUILDER"
-          python build_report.py || echo "build_report.py missing"
-          cp ep_report.html index.html || echo "no ep_report.html yet"
-          touch .nojekyll
+          echo "<h1>Test Page</h1><p>If you see this, Pages works.</p>" > index.html
           mkdir -p public
-          cp index.html ep_report.html ep_report.json .nojekyll public/ || true
+          cp index.html public/
           echo "----- CONTENT OF ./public -----"
-          ls -l public || echo "no public dir"
-          echo "--------------------------------"
-      
-      - name: Show contents of public
-        run: |
-          echo "Listing ./public:"
-          ls -R ./public || echo "no public folder"
+          ls -l public
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
@@ -52,9 +44,6 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
