@@ -5,6 +5,11 @@ on:
     - cron: '0 13 * * *'   # 15:00 Zurich daily (13:00 UTC)
   workflow_dispatch:
 
+permissions:
+  contents: write      # allow pushing/committing
+  pages: write         # allow Pages deployment
+  id-token: write      # required by deploy-pages
+
 jobs:
   build:
     runs-on: ubuntu-latest
