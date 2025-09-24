@@ -1,0 +1,54 @@
+name: Build EP Screener Report
+
+on:
+  schedule:
+    - cron: '0 13 * * *'   # 15:00 Zurich daily (13:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install yfinance pandas
+
+      - name: Run report builder
+        run: |
+          echo "HELLO FROM BUILDER"
+          python build_report.py || echo "build_report.py missing"
+          cp ep_report.html index.html || echo "no ep_report.html yet"
+          touch .nojekyll
+          mkdir -p public
+          cp index.html ep_report.html ep_report.json .nojekyll public/ || true
+          echo "----- CONTENT OF ./public -----"
+          ls -l public || echo "no public dir"
+          echo "--------------------------------"
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+          
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
