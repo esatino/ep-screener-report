@@ -2,8 +2,8 @@ name: Build EP Screener Report
 
 on:
   schedule:
-    - cron: '0 13 * * *'   # 15:00 Europe/Zurich (13:00 UTC)
-  workflow_dispatch:
+    - cron: '0 13 * * *'   # 15:00 Zurich daily (13:00 UTC)
+  workflow_dispatch:        # manual run
 
 jobs:
   build:
@@ -17,19 +17,19 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install deps
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install yfinance pandas
 
-      - name: Build report
+      - name: Run report builder
         run: |
           python build_report.py
 
-      - name: Commit & push
+      - name: Commit & push report
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add ep_report.html ep_report.json || true
-          git commit -m "daily: update EP report" || echo "No changes"
+          git commit -m "update: EP report" || echo "No changes"
           git push
