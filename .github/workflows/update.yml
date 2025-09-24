@@ -3,7 +3,7 @@ name: Build EP Screener Report
 on:
   schedule:
     - cron: '0 13 * * *'   # 15:00 Zurich daily (13:00 UTC)
-  workflow_dispatch:        # manual run
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,12 +27,16 @@ jobs:
           python build_report.py
           cp ep_report.html index.html
           touch .nojekyll
-          ls -R .
+          mkdir -p public
+          cp index.html ep_report.html ep_report.json .nojekyll public/
+          echo "----- CONTENT OF ./public -----"
+          ls -l public
+          echo "--------------------------------"
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: ./public
           
   deploy:
     needs: build
