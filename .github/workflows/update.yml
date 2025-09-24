@@ -5,6 +5,11 @@ on:
     - cron: '0 13 * * *'   # 15:00 Zurich daily (13:00 UTC)
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,19 +29,26 @@ jobs:
 
       - name: Run report builder
         run: |
-          echo "HELLO FROM BUILDER"
+          echo "=== Running build_report.py ==="
           if python build_report.py; then
-            echo "✅ Report built"
+            echo "✅ build_report.py ran successfully"
+          else
+            echo "❌ build_report.py missing or failed"
+          fi
+          echo "=== Checking generated files in repo root ==="
+          ls -lh
+          echo "==============================="
+          if [ -f ep_report.html ]; then
             cp ep_report.html index.html
           else
-            echo "❌ build_report.py failed" >&2
-            echo "<html><body><h1>Build failed</h1><p>Check Actions logs for details.</p></body></html>" > index.html
+            echo "⚠️ no ep_report.html generated"
+            echo "<html><body><h1>Build failed</h1><p>No ep_report.html found. Check logs.</p></body></html>" > index.html
           fi
           touch .nojekyll
           mkdir -p public
           cp index.html ep_report.html ep_report.json .nojekyll public/ 2>/dev/null || true
           echo "----- CONTENT OF ./public -----"
-          ls -l public || echo "no public dir"
+          ls -lh public || echo "⚠️ no public dir"
           echo "--------------------------------"
 
       - name: Upload artifact for GitHub Pages
