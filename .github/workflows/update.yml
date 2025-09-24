@@ -33,3 +33,5 @@ jobs:
           git add ep_report.html ep_report.json || true
           git commit -m "update: EP report" || echo "No changes"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
