@@ -1,1 +1,26 @@
+name: Update EP Screener Report
 
+on:
+  schedule:
+    - cron: '0 13 * * *'   # Runs every day at 15:00 Zurich (13:00 UTC)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch EP Report from ChatGPT
+        run: |
+          echo "<html><body><h1>EP Screener Report</h1><p>Auto-updated at $(date)</p></body></html>" > ep_report.html
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ep_report.html
+          git commit -m "Update EP Screener Report" || echo "No changes to commit"
+          git push
