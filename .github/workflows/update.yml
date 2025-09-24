@@ -33,6 +33,11 @@ jobs:
           echo "----- CONTENT OF ./public -----"
           ls -l public || echo "no public dir"
           echo "--------------------------------"
+      
+      - name: Show contents of public
+        run: |
+          echo "Listing ./public:"
+          ls -R ./public || echo "no public folder"
 
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
