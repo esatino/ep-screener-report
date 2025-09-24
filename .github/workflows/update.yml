@@ -25,12 +25,13 @@ jobs:
       - name: Run report builder
         run: |
           python build_report.py
+          cp ep_report.html index.html
 
       - name: Commit & push report
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ep_report.html ep_report.json || true
+          git add ep_report.html ep_report.json index.html || true
           git commit -m "update: EP report" || echo "No changes"
           git push
         env:
